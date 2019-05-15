@@ -142,7 +142,7 @@ class Network:
           samples[:, i, j, k] = next_sample[:, i, j, k]
 
           if self.data == 'mnist':
-            print "=" * (self.width/2), "(%2d, %2d)" % (i, j), "=" * (self.width/2)
+            print("=" * (self.width/2), "(%2d, %2d)" % (i, j), "=" * (self.width/2))
             mprint(next_sample[0,:,:,:])
 
     return samples

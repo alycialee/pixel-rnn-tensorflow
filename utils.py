@@ -18,17 +18,17 @@ pp = pprint.PrettyPrinter().pprint
 logger = logging.getLogger(__name__)
 
 def mprint(matrix, pivot=0.5):
-  for array in matrix:
-    print "".join("#" if i > pivot else " " for i in array)
+    for array in matrix:
+        print("".join("#" if i > pivot else " " for i in array))
 
 def show_all_variables():
-  total_count = 0
-  for idx, op in enumerate(tf.trainable_variables()):
-    shape = op.get_shape()
-    count = np.prod(shape)
-    print "[%2d] %s %s = %s" % (idx, op.name, shape, count)
-    total_count += int(count)
-  print "[Total] variable size: %s" % "{:,}".format(total_count)
+    total_count = 0
+    for idx, op in enumerate(tf.trainable_variables()):
+        shape = op.get_shape()
+        count = np.prod(shape)
+        print("[%2d] %s %s = %s" % (idx, op.name, shape, count))
+        total_count += int(count)
+    print("[Total] variable size: %s" % "{:,}".format(total_count))
 
 def get_timestamp():
   now = datetime.datetime.now(dateutil.tz.tzlocal())
@@ -48,10 +48,11 @@ def save_images(images, height, width, n_row, n_col,
       .save(os.path.join(directory, filename))
 
 def get_model_dir(config, exceptions=None):
-  attrs = config.__dict__['__flags']
+  attrs = config.__flags
+  
   pp(attrs)
 
-  keys = attrs.keys()
+  keys = list(attrs.keys())
   keys.sort()
   keys.remove('data')
   keys = ['data'] + keys
