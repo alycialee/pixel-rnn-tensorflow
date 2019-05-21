@@ -18,7 +18,7 @@ class Statistic(object):
     self.model_dir = model_dir
     self.saver = tf.train.Saver(variables + [self.t_op], max_to_keep=max_to_keep)
     # FIXED pre-1.0 # self.writer = tf.train.SummaryWriter('./logs/%s' % self.model_dir, self.sess.graph)
-    self.writer = tf.summary.FileWriter('./logs/%s' % self.model_dir, self.sess.graph)
+    # self.writer = tf.summary.FileWriter('./logs/%s' % self.model_dir, self.sess.graph)
 
     with tf.variable_scope('summary'):
       scalar_summary_tags = ['train_l', 'test_l']
@@ -49,8 +49,8 @@ class Statistic(object):
     summary_str_lists = self.sess.run([self.summary_ops[tag] for tag in tag_dict.keys()], {
       self.summary_placeholders[tag]: value for tag, value in tag_dict.items()
     })
-    for summary_str in summary_str_lists:
-      self.writer.add_summary(summary_str, t)
+    #for summary_str in summary_str_lists:
+    #  self.writer.add_summary(summary_str, t)
 
   def save_model(self, t):
     logger.info("Saving checkpoints...")
@@ -67,7 +67,7 @@ class Statistic(object):
 
     logger.info("Loading checkpoints...")
     ckpt = tf.train.get_checkpoint_state(self.model_dir)
-    if ckpt and ckpt.model_checkpoint_path:
+    if ckpt and ckpt.model_checkpoint_path: ##################################################################
       ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
       fname = os.path.join(self.model_dir, ckpt_name)
       self.saver.restore(self.sess, fname)

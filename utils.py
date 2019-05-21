@@ -61,9 +61,10 @@ def get_model_dir(config, exceptions=None):
   for key in keys:
     # Only use useful flags
     if key not in exceptions:
-      names.append("%s=%s" % (key, ",".join([str(i) for i in attrs[key]])
-          if type(attrs[key]) == list else attrs[key]))
-  return os.path.join('checkpoints', *names) + '/'
+      names.append("%s=%s" % (key, str(attrs[key].__dict__['default'])))
+  
+  #return os.path.join('checkpoints', *names) + '/'
+  return 'checkpoints\\' + "".join(names) + '/'
 
 def preprocess_conf(conf):
   options = conf.__flags
