@@ -1,6 +1,3 @@
-import logging
-logging.basicConfig(format="[%(asctime)s] %(message)s", datefmt="%m-%d %H:%M:%S")
-
 import numpy as np
 import tensorflow as tf
 from tensorflow.python.ops import rnn_cell
@@ -10,10 +7,36 @@ from tensorflow.contrib.layers import variance_scaling_initializer
 WEIGHT_INITIALIZER = tf.contrib.layers.xavier_initializer()
 #WEIGHT_INITIALIZER = tf.uniform_unit_scaling_initializer()
 
-logger = logging.getLogger(__name__)
-
 he_uniform = variance_scaling_initializer(factor=2.0, mode="FAN_IN", uniform=False)
 data_format = "NCHW"
+
+# CHANGE: replaced flags with variables
+model = "pixel_cnn"
+batch_size = 100
+hidden_dims = 16
+recurrent_length = 7
+out_hidden_dims = 32
+out_recurrent_length = 2
+use_residual = False
+
+# training
+max_epoch = 100000
+test_step = 100
+save_step = 1000
+learning_rate = 1e-3
+grad_clip = 1
+use_gpu = True
+
+# data
+data = "mnist"
+data_dir = "data"
+sample_dir = "samples"
+
+# Debug
+is_train = True
+display = False
+log_level = "INFO"
+random_seed = 123
 
 def get_shape(layer):
   return layer.get_shape().as_list()
@@ -51,7 +74,7 @@ def skew(inputs, scope="skew"):
     outputs = tf.stack(new_rows, axis=1, name="output")
     assert get_shape(outputs) == [None, height, new_width, channel], "wrong shape of skewed output"
 
-  logger.debug('[skew] %s : %s %s -> %s %s' \
+  print('[skew] %s : %s %s -> %s %s' \
       % (scope, inputs.name, inputs.get_shape(), outputs.name, outputs.get_shape()))
   return outputs
 
@@ -69,7 +92,7 @@ def unskew(inputs, width=None, scope="unskew"):
     # FIXED pre-1.0 # outputs = tf.concat(1, new_rows, name="output")
     outputs = tf.concat(new_rows, 1, name="output")
 
-  logger.debug('[unskew] %s : %s %s -> %s %s' \
+  print('[unskew] %s : %s %s -> %s %s' \
       % (scope, inputs.name, inputs.get_shape(), outputs.name, outputs.get_shape()))
   return outputs
 
@@ -129,7 +152,7 @@ def conv2d(
     if activation_fn:
       outputs = activation_fn(outputs, name='outputs_with_fn')
 
-    logger.debug('[conv2d_%s] %s : %s %s -> %s %s' \
+    print('[conv2d_%s] %s : %s %s -> %s %s' \
         % (mask_type, scope, inputs.name, inputs.get_shape(), outputs.name, outputs.get_shape()))
 
     return outputs
@@ -170,28 +193,28 @@ def conv1d(
     if activation_fn:
       outputs = activation_fn(outputs, name='outputs_with_fn')
 
-    logger.debug('[conv1d] %s : %s %s -> %s %s' \
+    print('[conv1d] %s : %s %s -> %s %s' \
         % (scope, inputs.name, inputs.get_shape(), outputs.name, outputs.get_shape()))
 
     return outputs
 
-def diagonal_bilstm(inputs, conf, scope='diagonal_bilstm'):
+def diagonal_bilstm(inputs, scope='diagonal_bilstm'):
   with tf.variable_scope(scope):
     def reverse(inputs):
       # FIXED pre-1.0 # return tf.reverse(inputs, [False, False, True, False])
       return tf.reverse(inputs, [2]) # [False, False, True, False])
 
-    output_state_fw = diagonal_lstm(inputs, conf, scope='output_state_fw')
-    output_state_bw = reverse(diagonal_lstm(reverse(inputs), conf, scope='output_state_bw'))
+    output_state_fw = diagonal_lstm(inputs, scope='output_state_fw')
+    output_state_bw = reverse(diagonal_lstm(reverse(inputs), scope='output_state_bw'))
 
     tf.add_to_collection('output_state_fw', output_state_fw)
     tf.add_to_collection('output_state_bw', output_state_bw)
 
-    if conf.use_residual:
-      residual_state_fw = conv2d(output_state_fw, conf.hidden_dims * 2, [1, 1], "B", scope="residual_fw")
+    if use_residual:
+      residual_state_fw = conv2d(output_state_fw, hidden_dims * 2, [1, 1], "B", scope="residual_fw")
       output_state_fw = residual_state_fw + inputs
 
-      residual_state_bw = conv2d(output_state_bw, conf.hidden_dims * 2, [1, 1], "B", scope="residual_bw")
+      residual_state_bw = conv2d(output_state_bw, hidden_dims * 2, [1, 1], "B", scope="residual_bw")
       output_state_bw = residual_state_bw + inputs
 
       tf.add_to_collection('residual_state_fw', residual_state_fw)
@@ -212,7 +235,7 @@ def diagonal_bilstm(inputs, conf, scope='diagonal_bilstm'):
 
     return output_state_fw + output_state_bw_with_last_zeros
 
-def diagonal_lstm(inputs, conf, scope='diagonal_lstm'):
+def diagonal_lstm(inputs, scope='diagonal_lstm'):
   with tf.variable_scope(scope):
     tf.add_to_collection('lstm_inputs', inputs)
 
@@ -220,7 +243,7 @@ def diagonal_lstm(inputs, conf, scope='diagonal_lstm'):
     tf.add_to_collection('skewed_lstm_inputs', skewed_inputs)
 
     # input-to-state (K_is * x_i) : 1x1 convolution. generate 4h x n x n tensor.
-    input_to_state = conv2d(skewed_inputs, conf.hidden_dims * 4, [1, 1], "B", scope="i_to_s")
+    input_to_state = conv2d(skewed_inputs, hidden_dims * 4, [1, 1], "B", scope="i_to_s")
     column_wise_inputs = tf.transpose(
         input_to_state, [0, 2, 1, 3]) # [batch, width, height, hidden_dims * 4]
 
@@ -238,7 +261,7 @@ def diagonal_lstm(inputs, conf, scope='diagonal_lstm'):
         # FIXED pre-1.0 # for rnn_input in tf.split(split_dim=1, num_split=width, value=rnn_inputs)]
         for rnn_input in tf.split(rnn_inputs, width, 1)]
 
-    cell = DiagonalLSTMCell(conf.hidden_dims, height, channel)
+    cell = DiagonalLSTMCell(hidden_dims, height, channel)
 
     # if conf.use_dynamic_rnn:
     if True:
@@ -255,7 +278,7 @@ def diagonal_lstm(inputs, conf, scope='diagonal_lstm'):
     #     packed_outputs = tf.stack(output_list, 1) # [batch, width, height * hidden_dims]
 
     width_first_outputs = tf.reshape(packed_outputs,
-        [-1, width, height, conf.hidden_dims]) # [batch, width, height, hidden_dims]
+        [-1, width, height, hidden_dims]) # [batch, width, height, hidden_dims]
 
     skewed_outputs = tf.transpose(width_first_outputs, [0, 2, 1, 3])
     tf.add_to_collection('skewed_outputs', skewed_outputs)
@@ -322,7 +345,7 @@ class DiagonalLSTMCell(rnn_cell.RNNCell):
       # FIXED pre-1.0 # h = tf.mul(o, tf.tanh(c), name='hid')
       h = tf.multiply(o, tf.tanh(c), name='hid')
 
-    logger.debug('[DiagonalLSTMCell] %s : %s %s -> %s %s' \
+    print('[DiagonalLSTMCell] %s : %s %s -> %s %s' \
         % (scope, i_to_s.name, i_to_s.get_shape(), h.name, h.get_shape()))
 
     # FIXED pre-1.0 # new_state = tf.concat(1, [c, h])

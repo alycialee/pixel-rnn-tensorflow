@@ -1,6 +1,3 @@
-import logging
-logging.basicConfig(format="[%(asctime)s] %(message)s", datefmt="%m-%d %H:%M:%S")
-
 import os
 import sys
 import urllib
@@ -15,7 +12,6 @@ import numpy as np
 import scipy.misc
 
 pp = pprint.PrettyPrinter().pprint
-logger = logging.getLogger(__name__)
 
 def mprint(matrix, pivot=0.5):
     for array in matrix:
@@ -74,10 +70,10 @@ def preprocess_conf(conf):
 
 def check_and_create_dir(directory):
   if not os.path.exists(directory):
-    logger.info('Creating directory: %s' % directory)
+    print('Creating directory: %s' % directory)
     os.makedirs(directory)
   else:
-    logger.info('Skip creating directory: %s' % directory)
+    print('Skip creating directory: %s' % directory)
 
 def maybe_download_and_extract(dest_directory):
   """
