@@ -55,12 +55,9 @@ class Statistic(object):
   def save_model(self, t):
     logger.info("Saving checkpoints...")
     model_name = type(self).__name__
-    print("MODELDIR")
-    print(type(self.model_dir))
-    print(self.model_dir)
-    if not os.path.exists(self.model_dir):
-      os.makedirs(self.model_dir)
-    self.saver.save(self.sess, self.model_dir, global_step=t)
+    if not os.path.exists("checkpoints/"): #self.model_dir
+      os.makedirs("checkpoints/")
+    self.saver.save(self.sess, "checkpoints/", global_step=t)
 
   def load_model(self):
     logger.info("Initializing all variables")
@@ -69,10 +66,8 @@ class Statistic(object):
 
     logger.info("Loading checkpoints...")
     ckpt = tf.train.get_checkpoint_state("checkpoints")
-    if ckpt and ckpt.model_checkpoint_path: ##################################################################
+    if ckpt and ckpt.model_checkpoint_path:
       ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
-      print("CHCKPTNAME")
-      print(ckpt_name)
       fname = os.path.join(ckpt_name)
       self.saver.restore(self.sess, fname)
       logger.info("Load SUCCESS: %s" % fname)
