@@ -40,8 +40,9 @@ def save_images(images, height, width, n_row, n_col,
   images = images.reshape((height * n_row, width * n_col))
 
   filename = '%s_%s.jpg' % (prefix, get_timestamp())
-  scipy.misc.toimage(images, cmin=cmin, cmax=cmax) \
-      .save(os.path.join(directory, filename))
+  #scipy.misc.toimage(images, cmin=cmin, cmax=cmax) \
+  #    .save(os.path.join(directory, filename))
+  scipy.misc.toimage(images, cmin=cmin, cmax=cmax).save(filename)
 
 def get_model_dir(config, exceptions=None):
   attrs = config.__flags
