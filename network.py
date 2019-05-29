@@ -18,7 +18,7 @@ test_step = 100
 save_step = 1000
 learning_rate = 1e-3
 grad_clip = 1
-use_gpu = True
+use_gpu = False
 
 # data
 data = "mnist"
