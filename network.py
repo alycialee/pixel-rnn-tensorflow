@@ -4,7 +4,7 @@ from ops import *
 from utils import *
 
 # CHANGE: replaced flags with variables
-model = "pixel_cnn"
+model = "pixel_rnn"
 batch_size = 100
 hidden_dims = 16
 recurrent_length = 7
@@ -18,7 +18,7 @@ test_step = 100
 save_step = 1000
 learning_rate = 1e-3
 grad_clip = 1
-use_gpu = False
+use_gpu = True
 
 # data
 data = "mnist"

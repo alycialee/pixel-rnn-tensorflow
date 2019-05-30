@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 
 # CHANGE: replaced flags with variables
-model = "pixel_cnn"
+model = "pixel_rnn"
 batch_size = 100
 hidden_dims = 16
 recurrent_length = 7
@@ -82,7 +82,7 @@ class Statistic(object):
     model_name = type(self).__name__
     if not os.path.exists("checkpoints/"): #self.model_dir
       os.makedirs("checkpoints/")
-    self.saver.save(self.sess, "checkpoints/", global_step=t)
+    self.saver.save(self.sess, "checkpoints", global_step=t)
 
   def load_model(self):
     print("Initializing all variables")
@@ -94,7 +94,7 @@ class Statistic(object):
     if ckpt and ckpt.model_checkpoint_path:
       ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
       fname = os.path.join(ckpt_name)
-      self.saver.restore(self.sess, fname)
+      self.saver.restore(self.sess, 'checkpoints/'+fname)
       print("Load SUCCESS: %s" % fname)
     else:
       print("Load FAILED: %s" % self.model_dir)
