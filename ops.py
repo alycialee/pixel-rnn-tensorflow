@@ -11,7 +11,7 @@ he_uniform = variance_scaling_initializer(factor=2.0, mode="FAN_IN", uniform=Fal
 data_format = "NCHW"
 
 # CHANGE: replaced flags with variables
-model = "pixel_rnn"
+model = "pixel_cnn"
 batch_size = 100
 hidden_dims = 16
 recurrent_length = 7

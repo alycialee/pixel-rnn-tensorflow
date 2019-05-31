@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 
 # CHANGE: replaced flags with variables
-model = "pixel_rnn"
+model = "pixel_cnn"
 batch_size = 100
 hidden_dims = 16
 recurrent_length = 7
