@@ -12,6 +12,7 @@ import datetime
 import dateutil.tz
 import numpy as np
 import PIL
+from PIL import Image
 
 import scipy.misc
 
@@ -38,6 +39,7 @@ def get_timestamp():
 def binarize(images):
   return (np.random.uniform(size=images.shape) < images).astype('float32')
 
+# Eric - changed from scipy.misc.toimage -> pillow.fromarray
 def save_images(images, height, width, n_row, n_col, 
       cmin=0.0, cmax=1.0, directory="./", prefix="sample"):
   images = images.reshape((n_row, n_col, height, width))
@@ -46,11 +48,12 @@ def save_images(images, height, width, n_row, n_col,
 
   filename = '{}_{}.jpg'.format(prefix, get_timestamp())
   
-  # Eric - changed from scipy.misc.toimage -> pillow.fromarray
-  image_obj = PIL.Image.fromarray(images)
-  # Eric - this converts image to grayscale
-  image_obj = image_obj.convert("RGB")
-  image_obj.save(filename)
+  image_obj = Image.fromarray(images, 'L')
+  image_obj.save('test_image.jpg')
+
+  mat = np.random.random((100,100))
+  mat_obj = PIL.Image.fromarray(mat, 'L')
+  mat_obj.save('random_image.jpg')
 
 def get_model_dir(config, exceptions=None):
   attrs = config.__dict__['__flags']

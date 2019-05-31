@@ -23,7 +23,7 @@ flags.DEFINE_boolean("use_residual", False, "whether to use residual connections
 # flags.DEFINE_boolean("use_dynamic_rnn", False, "whether to use dynamic_rnn or not")
 
 # training
-flags.DEFINE_integer("max_epoch", 2, "# of step in an epoch")
+flags.DEFINE_integer("max_epoch", 3, "# of step in an epoch")
 flags.DEFINE_integer("test_step", 100, "# of step to test a model")
 flags.DEFINE_integer("save_step", 1000, "# of step to save a model")
 flags.DEFINE_float("learning_rate", 1e-3, "learning rate")
@@ -104,7 +104,7 @@ def main(_):
         print("Epoch count is: ", count)
         # 1. train
         total_train_costs = []
-         
+
         for idx in range(train_step_per_epoch):
           # Eric added - print progress within an epoch
           print("train step percent in this epoch:", (idx / train_step_per_epoch))
@@ -115,6 +115,7 @@ def main(_):
           total_train_costs.append(cost)
         print("Train of this epoch done")
         # 2. test
+        # Eric - probably should print these test statistics. I'm not sure where they go.
         total_test_costs = []
         for idx in range(test_step_per_epoch):
           images = binarize(next_test_batch(conf.batch_size)) \
