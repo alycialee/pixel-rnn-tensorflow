@@ -23,7 +23,7 @@ flags.DEFINE_boolean("use_residual", False, "whether to use residual connections
 # flags.DEFINE_boolean("use_dynamic_rnn", False, "whether to use dynamic_rnn or not")
 
 # training
-flags.DEFINE_integer("max_epoch", 3, "# of step in an epoch")
+flags.DEFINE_integer("max_epoch", 10, "# of step in an epoch")
 flags.DEFINE_integer("test_step", 100, "# of step to test a model")
 flags.DEFINE_integer("save_step", 1000, "# of step to save a model")
 flags.DEFINE_float("learning_rate", 1e-3, "learning rate")
@@ -95,27 +95,24 @@ def main(_):
       initial_step = stat.get_t() if stat else 0
       iterator = trange(conf.max_epoch, ncols=70, initial=initial_step)
 
-      # Eric added - count 
-      count = 0
+      # Eric - count epochs
+      epoch_count = 0
 
       for epoch in iterator:
-        # Eric added - count the iterations and print
-        count += 1
-        print("Epoch count is: ", count)
+        
         # 1. train
         total_train_costs = []
 
         for idx in range(train_step_per_epoch):
-          # Eric added - print progress within an epoch
-          print("train step percent in this epoch:", (idx / train_step_per_epoch))
+          # Eric - print progress within an epoch
+          # print("train step percent in this epoch:", (idx / train_step_per_epoch))
           images = binarize(next_train_batch(conf.batch_size)) \
             .reshape([conf.batch_size, height, width, channel])
 
           cost = network.test(images, with_update=True)
           total_train_costs.append(cost)
-        print("Train of this epoch done")
+
         # 2. test
-        # Eric - probably should print these test statistics. I'm not sure where they go.
         total_test_costs = []
         for idx in range(test_step_per_epoch):
           images = binarize(next_test_batch(conf.batch_size)) \
@@ -126,8 +123,11 @@ def main(_):
 
         avg_train_cost, avg_test_cost = np.mean(total_train_costs), np.mean(total_test_costs)
 
-        print("Test of this epoch done")
+        # Eric - print stats for each iteration
+        epoch_count += 1
+        print("Epoch: {}, train l: {}, test l: {}".format(epoch_count, avg_train_cost, avg_test_cost))
 
+        # Eric - saves model? 
         stat.on_step(avg_train_cost, avg_test_cost)
 
       # Eric - originally this block below was in the for loop. moved out. 
@@ -136,7 +136,6 @@ def main(_):
       save_images(samples, height, width, 10, 10,
           directory=SAMPLE_DIR, prefix="epoch_{}".format(epoch))
 
-      iterator.set_description("train l: %.3f, test l: %.3f" % (avg_train_cost, avg_test_cost))
       print("Sample generation of this epoch done")
     else:
       logger.info("Image generation starts!")
