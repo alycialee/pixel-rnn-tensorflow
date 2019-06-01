@@ -2,6 +2,7 @@ import os
 import numpy as np
 import tensorflow as tf
 from logging import getLogger
+import csv
 
 logger = getLogger(__name__)
 
@@ -34,7 +35,12 @@ class Statistic(object):
   def reset(self):
     pass
 
-  def on_step(self, train_l, test_l):
+  def on_step(self, train_l, test_l, save_dir):
+    # Eric - write errors to csv file. writes train_l, test_l
+    with open(save_dir, 'w') as errorFile:
+      errorWriter = csv.writer(errorFile, delimiter =',')
+      errorWriter.writerow([train_l, test_l])
+
     self.t = self.t_add_op.eval(session=self.sess)
 
     self.inject_summary({'train_l': train_l, 'test_l': test_l}, self.t)

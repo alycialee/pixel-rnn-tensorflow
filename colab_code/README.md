@@ -1,7 +1,19 @@
 Created by Eric on May 29. 
 
-Trains correctly
+====
+Done
+====
 
-Outputs a very black image - unsure why. Doesn't seem to be problem w/ image saving func. It saves a randomly created image correctly.
+Trains correctly - change flag max_epoch for # epochs. 
 
-Metrics are printed. For MNIST, training goes down but test basically doesn't. Not sure why.
+Prints out images correctly. Only does it at the end. 
+
+Doesn't save checkpoints correctly. Unsure why. 
+
+Metrics are both printed and saved in error_file_{timestamp}.csv. Each row i of error_file = (training loss, test loss) at epoch i. 
+
+====
+Todo
+====
+
+Make loading work - likely bc I set the save_dir to model. However, actual checkpoints don't go in model, they just go in general directory. 

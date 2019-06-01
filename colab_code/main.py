@@ -23,7 +23,7 @@ flags.DEFINE_boolean("use_residual", False, "whether to use residual connections
 # flags.DEFINE_boolean("use_dynamic_rnn", False, "whether to use dynamic_rnn or not")
 
 # training
-flags.DEFINE_integer("max_epoch", 10, "# of step in an epoch")
+flags.DEFINE_integer("max_epoch", 30, "# of step in an epoch")
 flags.DEFINE_integer("test_step", 100, "# of step to test a model")
 flags.DEFINE_integer("save_step", 1000, "# of step to save a model")
 flags.DEFINE_float("learning_rate", 1e-3, "learning rate")
@@ -94,12 +94,11 @@ def main(_):
 
       initial_step = stat.get_t() if stat else 0
       iterator = trange(conf.max_epoch, ncols=70, initial=initial_step)
-
-      # Eric - count epochs
-      epoch_count = 0
+      
+      # Eric - define the filename where we store errors
+      err_filename = 'error_file_{}.csv'.format(get_timestamp())
 
       for epoch in iterator:
-        
         # 1. train
         total_train_costs = []
 
@@ -124,11 +123,10 @@ def main(_):
         avg_train_cost, avg_test_cost = np.mean(total_train_costs), np.mean(total_test_costs)
 
         # Eric - print stats for each iteration
-        epoch_count += 1
-        print("Epoch: {}, train l: {}, test l: {}".format(epoch_count, avg_train_cost, avg_test_cost))
+        print("Epoch: {}, train l: {}, test l: {}".format(epoch, avg_train_cost, avg_test_cost))
 
-        # Eric - saves model? 
-        stat.on_step(avg_train_cost, avg_test_cost)
+        # Eric - saves model. saves errors in err_filename w/ form (train l, test l)
+        stat.on_step(avg_train_cost, avg_test_cost, err_filename)
 
       # Eric - originally this block below was in the for loop. moved out. 
       # 3. generate samples
