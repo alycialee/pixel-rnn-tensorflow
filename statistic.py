@@ -82,7 +82,7 @@ class Statistic(object):
     model_name = type(self).__name__
     if not os.path.exists("checkpoints/"): #self.model_dir
       os.makedirs("checkpoints/")
-    self.saver.save(self.sess, "checkpoints", global_step=t)
+    self.saver.save(self.sess, "checkpoints/", global_step=t)
 
   def load_model(self):
     print("Initializing all variables")
