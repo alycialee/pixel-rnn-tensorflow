@@ -48,12 +48,11 @@ def save_images(images, height, width, n_row, n_col,
 
   filename = '{}_{}.jpg'.format(prefix, get_timestamp())
   
-  image_obj = Image.fromarray(images, 'L')
+  # Eric - pillow doesn't work w bit images. need byte images w uint8
+  images = images.astype(np.uint8) * 255
+  image_obj = PIL.Image.fromarray(images, 'L')
+  
   image_obj.save('test_image.jpg')
-
-  mat = np.random.random((100,100))
-  mat_obj = PIL.Image.fromarray(mat, 'L')
-  mat_obj.save('random_image.jpg')
 
 def get_model_dir(config, exceptions=None):
   attrs = config.__dict__['__flags']
