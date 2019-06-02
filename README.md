@@ -32,7 +32,7 @@ First, install prerequisites with:
 
 To train a `pixel_rnn` model with `mnist` data (slow iteration, fast convergence):
 
-    $ python main.py --data=mnist --model=pixel_rnn
+    $ python main.py --data=mnist --model=pixel_rnn --max_epoch=30 --use_swapout=True
 
 To train a `pixel_cnn` model with `mnist` data (fast iteration, slow convergence):
 
