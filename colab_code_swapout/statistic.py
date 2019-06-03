@@ -37,7 +37,7 @@ class Statistic(object):
 
   def on_step(self, train_l, test_l, save_dir):
     # Eric - write errors to csv file. writes train_l, test_l
-    with open(save_dir, 'w') as errorFile:
+    with open(save_dir, 'a') as errorFile:
       errorWriter = csv.writer(errorFile, delimiter =',')
       errorWriter.writerow([train_l, test_l])
 

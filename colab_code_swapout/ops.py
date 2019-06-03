@@ -6,6 +6,9 @@ import tensorflow as tf
 from tensorflow.python.ops import rnn_cell
 from tensorflow.examples.tutorials.mnist import input_data
 from tensorflow.contrib.layers import variance_scaling_initializer
+from tensorflow.python.ops import array_ops
+from tensorflow.python.ops import math_ops
+from tensorflow.python.ops import random_ops
 
 WEIGHT_INITIALIZER = tf.contrib.layers.xavier_initializer()
 #WEIGHT_INITIALIZER = tf.uniform_unit_scaling_initializer()
@@ -187,19 +190,44 @@ def diagonal_bilstm(inputs, conf, seed = None, scope='diagonal_bilstm'):
     tf.add_to_collection('output_state_fw', output_state_fw)
     tf.add_to_collection('output_state_bw', output_state_bw)
 
-    noise_shape = array_ops.shape(output_state_fw)
+    #noise_shape = array_ops.shape(output_state_fw)
+    # Mayank - added swapout capability here. 
     if conf.use_swapout:
+      print("Using swapout!!!! yeet")
       theta1 = conf.p1
       theta2 = conf.p2
-      keep_prob = conf.p1 +random_tensor 
-      theta1 += random_ops.random_uniform(noise_shape, seed=seed, dtype=output_state_fw.dtype)
-      theta2 += random_ops.random_uniform(noise_shape, seed=seed, dtype=output_state_fw.dtype)
+      #conf.p1 +random_tensor = keep_prob
+      #theta1 += random_ops.random_uniform(noise_shape, seed=seed, dtype=output_state_fw.dtype)
+      #theta2 += random_ops.random_uniform(noise_shape, seed=seed * 2, dtype=output_state_fw.dtype)
+
+      mask1 = math_ops.floor(theta1)
+      mask2 = math_ops.floor(theta2)
 
       residual_state_fw = conv2d(output_state_fw, conf.hidden_dims * 2, [1, 1], "B", scope="residual_fw")
-      output_state_fw = theta_1 * residual_state_fw + theta_2 * inputs
 
       residual_state_bw = conv2d(output_state_bw, conf.hidden_dims * 2, [1, 1], "B", scope="residual_bw")
-      output_state_bw = theta_1 * residual_state_bw + theta_2 * inputs
+
+      theta1 += random_ops.random_uniform(array_ops.shape(residual_state_fw), seed=seed, dtype=output_state_fw.dtype)
+      if(seed != None):
+        theta2 += random_ops.random_uniform(array_ops.shape(inputs), seed=seed * 2, dtype=output_state_fw.dtype)
+
+      mask1 = math_ops.floor(theta1)
+      mask2 = math_ops.floor(theta2)
+      output_state_fw = mask1 * residual_state_fw + mask2 * inputs
+      output_state_bw = mask1 * residual_state_bw + mask2 * inputs
+
+      tf.add_to_collection('residual_state_fw', residual_state_fw)
+      tf.add_to_collection('residual_state_bw', residual_state_bw)
+      tf.add_to_collection('residual_output_state_fw', output_state_fw)
+      tf.add_to_collection('residual_output_state_bw', output_state_bw)
+
+    elif conf.use_residual:
+      print("Using resnet!!!! yeet")
+      residual_state_fw = conv2d(output_state_fw, conf.hidden_dims * 2, [1, 1], "B", scope="residual_fw")
+      output_state_fw = residual_state_fw + inputs
+
+      residual_state_bw = conv2d(output_state_bw, conf.hidden_dims * 2, [1, 1], "B", scope="residual_bw")
+      output_state_bw = residual_state_bw + inputs
 
       tf.add_to_collection('residual_state_fw', residual_state_fw)
       tf.add_to_collection('residual_state_bw', residual_state_bw)

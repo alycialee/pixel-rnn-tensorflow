@@ -1,0 +1,4 @@
+50 epochs on pixelRNN
+
+No swapout
+No resent

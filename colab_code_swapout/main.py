@@ -12,13 +12,17 @@ from statistic import Statistic
 
 flags = tf.app.flags
 
+# Important flags
+# Eric - if use_swapout=True, will overwrite use_residual=True. Cannot use both. 
+flags.DEFINE_boolean("use_swapout", True, "using swapout") 
+flags.DEFINE_string("model", "pixel_cnn", "name of model [pixel_rnn, pixel_cnn]")
+flags.DEFINE_integer("max_epoch", 30, "# of step in an epoch")
+
 # Eric - swapout flags
-flags.DEFINE_boolean("use_swapout", True, "using swapout")
 flags.DEFINE_float("p1", 0.8, "probability 1?")
-flags.DEFINE_float("p2", 0.8, "probability 2?")
+flags.DEFINE_float("p2", 0.2, "probability 2?")
 
 # network
-flags.DEFINE_string("model", "pixel_cnn", "name of model [pixel_rnn, pixel_cnn]")
 flags.DEFINE_integer("batch_size", 100, "size of a batch")
 flags.DEFINE_integer("hidden_dims", 16, "dimesion of hidden states of LSTM or Conv layers")
 flags.DEFINE_integer("recurrent_length", 7, "the length of LSTM or Conv layers")
@@ -28,7 +32,6 @@ flags.DEFINE_boolean("use_residual", False, "whether to use residual connections
 # flags.DEFINE_boolean("use_dynamic_rnn", False, "whether to use dynamic_rnn or not")
 
 # training
-flags.DEFINE_integer("max_epoch", 30, "# of step in an epoch")
 flags.DEFINE_integer("test_step", 100, "# of step to test a model")
 flags.DEFINE_integer("save_step", 1000, "# of step to save a model")
 flags.DEFINE_float("learning_rate", 1e-3, "learning rate")
