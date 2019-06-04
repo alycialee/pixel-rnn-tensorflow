@@ -9,6 +9,7 @@ import tensorflow as tf
 from utils import *
 from network import Network
 from statistic import Statistic
+import csv
 
 flags = tf.app.flags
 
@@ -105,6 +106,15 @@ def main(_):
       
       # Eric - define the filename where we store errors
       err_filename = 'error_file_{}.csv'.format(get_timestamp())
+
+      # Eric - writes params to first two lines of file
+      with open(err_filename, 'a') as errorFile:
+        errorWriter = csv.writer(errorFile, delimiter =',')
+        errorWriter.writerow(['model', 'max_epoch', 'use_swapout', 
+          'use_residual', 'swapout_p1', 'swapout_p2'])
+        errorWriter.writerow([conf.model, conf.max_epoch, conf.use_swapout, 
+          conf.use_residual, conf.p1, conf.p2])
+      errorFile.close()
 
       for epoch in iterator:
         # 1. train

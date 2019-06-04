@@ -40,6 +40,7 @@ class Statistic(object):
     with open(save_dir, 'a') as errorFile:
       errorWriter = csv.writer(errorFile, delimiter =',')
       errorWriter.writerow([train_l, test_l])
+    errorFile.close()
 
     self.t = self.t_add_op.eval(session=self.sess)
 
