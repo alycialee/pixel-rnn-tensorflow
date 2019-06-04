@@ -148,6 +148,7 @@ def conv2d(
       biases = tf.get_variable("biases", [num_outputs,],
           tf.float32, biases_initializer, biases_regularizer)
       outputs = tf.nn.bias_add(outputs, biases, name='outputs_plus_b')
+    outputs += inputs # Mayank + Alycia - res in pixelCNN 
 
     if activation_fn:
       outputs = activation_fn(outputs, name='outputs_with_fn')
