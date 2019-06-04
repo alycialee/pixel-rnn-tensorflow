@@ -1,0 +1,15 @@
+Code currently has: 
+cnn, rnn, swapout, resnet, image output, error saving
+Doesn't have:
+Plotting
+
+1. test swapout
+ - test resnet vs no resnet
+ - test swapout vs no swapout or resnet
+ - test swapout vs resnet 
+
+2. diagnose diff from carpediem results
+ - versioning (python 2, tensorflow 1.4.0?)
+
+3. parameter changes
+ - change learning rate
