@@ -11,19 +11,27 @@ errors = []
 
 for filename in all_files:
     data = csv.reader(open(filename, 'r'), delimiter=",")
-    column1, column2 = [], []
+    train_l, test_l = [], []
 
     for row in data:
-        column1.extend(row[0])
-        column2.extend(row[1])
+        if len(row) == 2:
+            train_l.append(float(row[0]))
+            test_l.append(float(row[1]))
 
-    print(column1)
-    print(column2)
+    if(len(train_l) != len(test_l)):
+        print("error: train loss and test loss diff number of epochs")
+    print(filename)
 
-# frame = pd.concat(errors, axis=0, ignore_index=True)
-# x = list(range(len(frame.iloc[:,0])))
-# for data in frame.iloc[:,0]:
-#     print(data)
-#     plt.plot(x, data, color='olive')
-# for data in frame.iloc[1::2, :]:
-#     plt.plot(x, data, color='skyblue')
+    x = np.array([i for i in range(len(train_l))])
+    _ = plt.plot(x[1:], train_l[1:])
+    _ = plt.plot(x[1:], test_l[1:])
+
+_ = plt.xlabel("Epochs")
+_ = plt.ylabel("Error (Cross Entropy)")
+_ = plt.title("PixelRNN: Swapout vs Resnet vs None")
+_ = plt.legend(['Train Loss - None', 'Test Loss - None', 'Train Loss - Resnet', 
+    'Test Loss - Resnet', 'Train Loss - Swapout', 'Test Loss - Swapout'], loc='upper right')
+# _ = plt.savefig("pixelrnn_30epochs_errs1")
+_ = plt.show()
+
+
