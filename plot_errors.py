@@ -23,8 +23,8 @@ for filename in all_files:
     print(filename)
 
     x = np.array([i for i in range(len(train_l))])
-    _ = plt.plot(x[1:], train_l[1:])
-    _ = plt.plot(x[1:], test_l[1:])
+    _ = plt.plot(x, train_l)
+    _ = plt.plot(x, test_l)
 
 _ = plt.xlabel("Epochs")
 _ = plt.ylabel("Error (Cross Entropy)")
