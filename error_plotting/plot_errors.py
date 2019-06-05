@@ -50,7 +50,6 @@ def plot(all_files, title, legend, plot_train, remove_first):
     plt.show()
 
 if __name__ == '__main__':
-    # put everything into a folder called errors at the same level as this py file
     path = 'errors'
     all_files = glob.glob(path + "/*.csv")
 
